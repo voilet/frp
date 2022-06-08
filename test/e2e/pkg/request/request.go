@@ -6,15 +6,14 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 
-	"github.com/fatedier/frp/test/e2e/pkg/rpc"
 	libnet "github.com/fatedier/golib/net"
+	"github.com/voilet/frp/test/e2e/pkg/rpc"
 )
 
 type Request struct {
@@ -219,7 +218,7 @@ func (r *Request) sendHTTPRequest(method, urlstr string, host string, headers ma
 	}
 
 	ret := &Response{Code: resp.StatusCode, Header: resp.Header}
-	buf, err := ioutil.ReadAll(resp.Body)
+	buf, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

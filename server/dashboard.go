@@ -19,8 +19,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/fatedier/frp/assets"
-	frpNet "github.com/fatedier/frp/pkg/util/net"
+	"github.com/voilet/frp/assets"
+	frpNet "github.com/voilet/frp/pkg/util/net"
 
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -48,6 +48,7 @@ func (svr *Service) RunDashboardServer(address string) (err error) {
 	router.HandleFunc("/api/proxy/{type}", svr.APIProxyByType).Methods("GET")
 	router.HandleFunc("/api/proxy/{type}/{name}", svr.APIProxyByTypeAndName).Methods("GET")
 	router.HandleFunc("/api/traffic/{name}", svr.APIProxyTraffic).Methods("GET")
+	router.HandleFunc("/healthz", svr.Healthz)
 
 	// view
 	router.Handle("/favicon.ico", http.FileServer(assets.FileSystem)).Methods("GET")

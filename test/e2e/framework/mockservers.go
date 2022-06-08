@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/fatedier/frp/test/e2e/framework/consts"
-	"github.com/fatedier/frp/test/e2e/mock/server"
-	"github.com/fatedier/frp/test/e2e/mock/server/httpserver"
-	"github.com/fatedier/frp/test/e2e/mock/server/streamserver"
-	"github.com/fatedier/frp/test/e2e/pkg/port"
+	"github.com/voilet/frp/test/e2e/framework/consts"
+	"github.com/voilet/frp/test/e2e/mock/server"
+	"github.com/voilet/frp/test/e2e/mock/server/httpserver"
+	"github.com/voilet/frp/test/e2e/mock/server/streamserver"
+	"github.com/voilet/frp/test/e2e/pkg/port"
 )
 
 const (

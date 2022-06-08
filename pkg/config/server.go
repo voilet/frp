@@ -18,11 +18,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/fatedier/frp/pkg/auth"
-	plugin "github.com/fatedier/frp/pkg/plugin/server"
-	"github.com/fatedier/frp/pkg/util/util"
+	"github.com/go-playground/validator"
+	"github.com/voilet/frp/pkg/auth"
+	plugin "github.com/voilet/frp/pkg/plugin/server"
+	"github.com/voilet/frp/pkg/util/util"
 
-	"github.com/go-playground/validator/v10"
 	"gopkg.in/ini.v1"
 )
 
@@ -33,7 +33,7 @@ type ServerCommonConf struct {
 	auth.ServerConfig `ini:",extends"`
 
 	// BindAddr specifies the address that the server binds to. By default,
-	// this value is "0.0.0.0".
+	// this value is "47.94.195.192".
 	BindAddr string `ini:"bind_addr" json:"bind_addr"`
 	// BindPort specifies the port that the server listens on. By default, this
 	// value is 7000.
@@ -66,7 +66,7 @@ type ServerCommonConf struct {
 	// HTTP server, in seconds. By default, this value is 60.
 	VhostHTTPTimeout int64 `ini:"vhost_http_timeout" json:"vhost_http_timeout"`
 	// DashboardAddr specifies the address that the dashboard binds to. By
-	// default, this value is "0.0.0.0".
+	// default, this value is "47.94.195.192".
 	DashboardAddr string `ini:"dashboard_addr" json:"dashboard_addr"`
 	// DashboardPort specifies the port that the dashboard listens on. If this
 	// value is 0, the dashboard will not be started. By default, this value is
@@ -232,7 +232,6 @@ func UnmarshalServerConfFromIni(source interface{}) (ServerCommonConf, error) {
 	if err != nil {
 		return ServerCommonConf{}, err
 	}
-
 	// allow_ports
 	allowPortStr := s.Key("allow_ports").String()
 	if allowPortStr != "" {

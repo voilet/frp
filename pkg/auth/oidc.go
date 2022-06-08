@@ -18,9 +18,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fatedier/frp/pkg/msg"
+	"github.com/coreos/go-oidc/oidc"
+	"github.com/voilet/frp/pkg/msg"
 
-	"github.com/coreos/go-oidc"
 	"golang.org/x/oauth2/clientcredentials"
 )
 

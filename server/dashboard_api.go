@@ -18,11 +18,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/fatedier/frp/pkg/config"
-	"github.com/fatedier/frp/pkg/consts"
-	"github.com/fatedier/frp/pkg/metrics/mem"
-	"github.com/fatedier/frp/pkg/util/log"
-	"github.com/fatedier/frp/pkg/util/version"
+	"github.com/voilet/frp/pkg/config"
+	"github.com/voilet/frp/pkg/consts"
+	"github.com/voilet/frp/pkg/metrics/mem"
+	"github.com/voilet/frp/pkg/util/log"
+	"github.com/voilet/frp/pkg/util/version"
 
 	"github.com/gorilla/mux"
 )
@@ -49,6 +49,11 @@ type serverInfoResp struct {
 	CurConns        int64            `json:"cur_conns"`
 	ClientCounts    int64            `json:"client_counts"`
 	ProxyTypeCounts map[string]int64 `json:"proxy_type_count"`
+}
+
+// /healthz
+func (svr *Service) Healthz(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
 }
 
 // api/serverinfo

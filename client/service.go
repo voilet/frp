@@ -19,7 +19,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"runtime"
 	"strconv"
@@ -27,15 +27,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/fatedier/frp/assets"
-	"github.com/fatedier/frp/pkg/auth"
-	"github.com/fatedier/frp/pkg/config"
-	"github.com/fatedier/frp/pkg/msg"
-	"github.com/fatedier/frp/pkg/transport"
-	"github.com/fatedier/frp/pkg/util/log"
-	frpNet "github.com/fatedier/frp/pkg/util/net"
-	"github.com/fatedier/frp/pkg/util/version"
-	"github.com/fatedier/frp/pkg/util/xlog"
+	"github.com/voilet/frp/assets"
+	"github.com/voilet/frp/pkg/auth"
+	"github.com/voilet/frp/pkg/config"
+	"github.com/voilet/frp/pkg/msg"
+	"github.com/voilet/frp/pkg/transport"
+	"github.com/voilet/frp/pkg/util/log"
+	frpNet "github.com/voilet/frp/pkg/util/net"
+	"github.com/voilet/frp/pkg/util/version"
+	"github.com/voilet/frp/pkg/util/xlog"
 
 	fmux "github.com/hashicorp/yamux"
 )
@@ -96,7 +96,6 @@ func (svr *Service) GetController() *Control {
 
 func (svr *Service) Run() error {
 	xl := xlog.FromContextSafe(svr.ctx)
-
 	// login to frps
 	for {
 		conn, session, err := svr.login()
@@ -124,13 +123,10 @@ func (svr *Service) Run() error {
 
 	if svr.cfg.AdminPort != 0 {
 		// Init admin server assets
-		err := assets.Load(svr.cfg.AssetsDir)
-		if err != nil {
-			return fmt.Errorf("Load assets error: %v", err)
-		}
+		assets.Load(svr.cfg.AssetsDir)
 
 		address := net.JoinHostPort(svr.cfg.AdminAddr, strconv.Itoa(svr.cfg.AdminPort))
-		err = svr.RunAdminServer(address)
+		err := svr.RunAdminServer(address)
 		if err != nil {
 			log.Warn("run admin server error: %v", err)
 		}
@@ -232,7 +228,7 @@ func (svr *Service) login() (conn net.Conn, session *fmux.Session, err error) {
 	}
 
 	address := net.JoinHostPort(svr.cfg.ServerAddr, strconv.Itoa(svr.cfg.ServerPort))
-	conn, err = frpNet.ConnectServerByProxyWithTLS(svr.cfg.HTTPProxy, svr.cfg.Protocol, address, tlsConfig)
+	conn, err = frpNet.ConnectServerByProxyWithTLS(svr.cfg.HTTPProxy, svr.cfg.Protocol, address, tlsConfig, svr.cfg.DisableCustomTLSFirstByte)
 	if err != nil {
 		return
 	}
@@ -249,7 +245,7 @@ func (svr *Service) login() (conn net.Conn, session *fmux.Session, err error) {
 	if svr.cfg.TCPMux {
 		fmuxCfg := fmux.DefaultConfig()
 		fmuxCfg.KeepAliveInterval = 20 * time.Second
-		fmuxCfg.LogOutput = ioutil.Discard
+		fmuxCfg.LogOutput = io.Discard
 		session, err = fmux.Client(conn, fmuxCfg)
 		if err != nil {
 			return

@@ -3,16 +3,15 @@ package framework
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"text/template"
 
-	"github.com/fatedier/frp/test/e2e/mock/server"
-	"github.com/fatedier/frp/test/e2e/pkg/port"
-	"github.com/fatedier/frp/test/e2e/pkg/process"
+	"github.com/voilet/frp/test/e2e/mock/server"
+	"github.com/voilet/frp/test/e2e/pkg/port"
+	"github.com/voilet/frp/test/e2e/pkg/process"
 
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
@@ -90,7 +89,7 @@ func (f *Framework) BeforeEach() {
 
 	f.cleanupHandle = AddCleanupAction(f.AfterEach)
 
-	dir, err := ioutil.TempDir(os.TempDir(), "frp-e2e-test-*")
+	dir, err := os.MkdirTemp(os.TempDir(), "frp-e2e-test-*")
 	ExpectNoError(err)
 	f.TempDirectory = dir
 
@@ -260,7 +259,7 @@ func (f *Framework) SetEnvs(envs []string) {
 
 func (f *Framework) WriteTempFile(name string, content string) string {
 	filePath := filepath.Join(f.TempDirectory, name)
-	err := ioutil.WriteFile(filePath, []byte(content), 0766)
+	err := os.WriteFile(filePath, []byte(content), 0766)
 	ExpectNoError(err)
 	return filePath
 }

@@ -24,7 +24,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/fatedier/frp/pkg/util/xlog"
+	"github.com/voilet/frp/pkg/util/xlog"
 
 	gnet "github.com/fatedier/golib/net"
 	kcp "github.com/fatedier/kcp-go"
@@ -228,7 +228,7 @@ func ConnectServerByProxy(proxyURL string, protocol string, addr string) (c net.
 	}
 }
 
-func ConnectServerByProxyWithTLS(proxyURL string, protocol string, addr string, tlsConfig *tls.Config) (c net.Conn, err error) {
+func ConnectServerByProxyWithTLS(proxyURL string, protocol string, addr string, tlsConfig *tls.Config, disableCustomTLSHeadByte bool) (c net.Conn, err error) {
 	c, err = ConnectServerByProxy(proxyURL, protocol, addr)
 	if err != nil {
 		return
@@ -238,6 +238,6 @@ func ConnectServerByProxyWithTLS(proxyURL string, protocol string, addr string, 
 		return
 	}
 
-	c = WrapTLSClientConn(c, tlsConfig)
+	c = WrapTLSClientConn(c, tlsConfig, disableCustomTLSHeadByte)
 	return
 }

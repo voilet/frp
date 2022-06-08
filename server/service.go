@@ -19,34 +19,34 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"sort"
 	"strconv"
 	"time"
 
-	"github.com/fatedier/frp/assets"
-	"github.com/fatedier/frp/pkg/auth"
-	"github.com/fatedier/frp/pkg/config"
-	modelmetrics "github.com/fatedier/frp/pkg/metrics"
-	"github.com/fatedier/frp/pkg/msg"
-	"github.com/fatedier/frp/pkg/nathole"
-	plugin "github.com/fatedier/frp/pkg/plugin/server"
-	"github.com/fatedier/frp/pkg/transport"
-	"github.com/fatedier/frp/pkg/util/log"
-	frpNet "github.com/fatedier/frp/pkg/util/net"
-	"github.com/fatedier/frp/pkg/util/tcpmux"
-	"github.com/fatedier/frp/pkg/util/util"
-	"github.com/fatedier/frp/pkg/util/version"
-	"github.com/fatedier/frp/pkg/util/vhost"
-	"github.com/fatedier/frp/pkg/util/xlog"
-	"github.com/fatedier/frp/server/controller"
-	"github.com/fatedier/frp/server/group"
-	"github.com/fatedier/frp/server/metrics"
-	"github.com/fatedier/frp/server/ports"
-	"github.com/fatedier/frp/server/proxy"
-	"github.com/fatedier/frp/server/visitor"
+	"github.com/voilet/frp/assets"
+	"github.com/voilet/frp/pkg/auth"
+	"github.com/voilet/frp/pkg/config"
+	modelmetrics "github.com/voilet/frp/pkg/metrics"
+	"github.com/voilet/frp/pkg/msg"
+	"github.com/voilet/frp/pkg/nathole"
+	plugin "github.com/voilet/frp/pkg/plugin/server"
+	"github.com/voilet/frp/pkg/transport"
+	"github.com/voilet/frp/pkg/util/log"
+	frpNet "github.com/voilet/frp/pkg/util/net"
+	"github.com/voilet/frp/pkg/util/tcpmux"
+	"github.com/voilet/frp/pkg/util/util"
+	"github.com/voilet/frp/pkg/util/version"
+	"github.com/voilet/frp/pkg/util/vhost"
+	"github.com/voilet/frp/pkg/util/xlog"
+	"github.com/voilet/frp/server/controller"
+	"github.com/voilet/frp/server/group"
+	"github.com/voilet/frp/server/metrics"
+	"github.com/voilet/frp/server/ports"
+	"github.com/voilet/frp/server/proxy"
+	"github.com/voilet/frp/server/visitor"
 
 	"github.com/fatedier/golib/net/mux"
 	fmux "github.com/hashicorp/yamux"
@@ -258,8 +258,9 @@ func NewService(cfg config.ServerCommonConf) (svr *Service, err error) {
 	}
 
 	// frp tls listener
-	svr.tlsListener = svr.muxer.Listen(1, 1, func(data []byte) bool {
-		return int(data[0]) == frpNet.FRPTLSHeadByte
+	svr.tlsListener = svr.muxer.Listen(2, 1, func(data []byte) bool {
+		// tls first byte can be 0x16 only when vhost https port is not same with bind port
+		return int(data[0]) == frpNet.FRPTLSHeadByte || int(data[0]) == 0x16
 	})
 
 	// Create nat hole controller.
@@ -279,11 +280,7 @@ func NewService(cfg config.ServerCommonConf) (svr *Service, err error) {
 	// Create dashboard web server.
 	if cfg.DashboardPort > 0 {
 		// Init dashboard assets
-		err = assets.Load(cfg.AssetsDir)
-		if err != nil {
-			err = fmt.Errorf("Load assets error: %v", err)
-			return
-		}
+		assets.Load(cfg.AssetsDir)
 
 		address := net.JoinHostPort(cfg.DashboardAddr, strconv.Itoa(cfg.DashboardPort))
 		err = svr.RunDashboardServer(address)
@@ -395,20 +392,21 @@ func (svr *Service) HandleListener(l net.Listener) {
 
 		log.Trace("start check TLS connection...")
 		originConn := c
-		c, err = frpNet.CheckAndEnableTLSServerConnWithTimeout(c, svr.tlsConfig, svr.cfg.TLSOnly, connReadTimeout)
+		var isTLS, custom bool
+		c, isTLS, custom, err = frpNet.CheckAndEnableTLSServerConnWithTimeout(c, svr.tlsConfig, svr.cfg.TLSOnly, connReadTimeout)
 		if err != nil {
 			log.Warn("CheckAndEnableTLSServerConnWithTimeout error: %v", err)
 			originConn.Close()
 			continue
 		}
-		log.Trace("success check TLS connection")
+		log.Trace("check TLS connection success, isTLS: %v custom: %v", isTLS, custom)
 
-		// Start a new goroutine for dealing connections.
+		// Start a new goroutine to handle connection.
 		go func(ctx context.Context, frpConn net.Conn) {
 			if svr.cfg.TCPMux {
 				fmuxCfg := fmux.DefaultConfig()
 				fmuxCfg.KeepAliveInterval = 20 * time.Second
-				fmuxCfg.LogOutput = ioutil.Discard
+				fmuxCfg.LogOutput = io.Discard
 				session, err := fmux.Server(frpConn, fmuxCfg)
 				if err != nil {
 					log.Warn("Failed to create mux connection: %v", err)

@@ -16,11 +16,12 @@ package vhost
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 
-	frpLog "github.com/fatedier/frp/pkg/util/log"
-	"github.com/fatedier/frp/pkg/util/version"
+	frpLog "github.com/voilet/frp/pkg/util/log"
+	"github.com/voilet/frp/pkg/util/version"
 )
 
 var (
@@ -44,7 +45,7 @@ const (
 <h1>The page you requested was not found.</h1>
 <p>Sorry, the page you are looking for is currently unavailable.<br/>
 Please try again later.</p>
-<p>The server is powered by <a href="https://github.com/fatedier/frp">frp</a>.</p>
+<p>The server is powered by <a href="https://github.com/voilet/frp">frp</a>.</p>
 <p><em>Faithfully yours, frp.</em></p>
 </body>
 </html>
@@ -57,7 +58,7 @@ func getNotFoundPageContent() []byte {
 		err error
 	)
 	if NotFoundPagePath != "" {
-		buf, err = ioutil.ReadFile(NotFoundPagePath)
+		buf, err = os.ReadFile(NotFoundPagePath)
 		if err != nil {
 			frpLog.Warn("read custom 404 page error: %v", err)
 			buf = []byte(NotFound)
@@ -80,7 +81,7 @@ func notFoundResponse() *http.Response {
 		ProtoMajor: 1,
 		ProtoMinor: 0,
 		Header:     header,
-		Body:       ioutil.NopCloser(bytes.NewReader(getNotFoundPageContent())),
+		Body:       io.NopCloser(bytes.NewReader(getNotFoundPageContent())),
 	}
 	return res
 }

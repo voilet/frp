@@ -6,10 +6,10 @@ import (
 	"net"
 	"sync"
 
-	"github.com/fatedier/frp/client/event"
-	"github.com/fatedier/frp/pkg/config"
-	"github.com/fatedier/frp/pkg/msg"
-	"github.com/fatedier/frp/pkg/util/xlog"
+	"github.com/voilet/frp/client/event"
+	"github.com/voilet/frp/pkg/config"
+	"github.com/voilet/frp/pkg/msg"
+	"github.com/voilet/frp/pkg/util/xlog"
 
 	"github.com/fatedier/golib/errors"
 )
@@ -140,6 +140,13 @@ func (pm *Manager) Reload(pxyCfgs map[string]config.ProxyConf) {
 			pxy.Start()
 		}
 	}
+
+	/*pxy := NewWrapper(pm.ctx, cfg, pm.clientCfg, pm.HandleEvent, pm.serverUDPPort)
+	pm.proxies[name] = pxy
+	addPxyNames = append(addPxyNames, name)
+
+	pxy.Start()*/
+
 	if len(addPxyNames) > 0 {
 		xl.Info("proxy added: %v", addPxyNames)
 	}

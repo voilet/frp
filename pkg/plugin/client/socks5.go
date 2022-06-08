@@ -16,11 +16,10 @@ package plugin
 
 import (
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 
-	frpNet "github.com/fatedier/frp/pkg/util/net"
+	frpNet "github.com/voilet/frp/pkg/util/net"
 
 	gosocks5 "github.com/armon/go-socks5"
 )
@@ -43,7 +42,7 @@ func NewSocks5Plugin(params map[string]string) (p Plugin, err error) {
 	passwd := params["plugin_passwd"]
 
 	cfg := &gosocks5.Config{
-		Logger: log.New(ioutil.Discard, "", log.LstdFlags),
+		Logger: log.New(io.Discard, "", log.LstdFlags),
 	}
 	if user != "" || passwd != "" {
 		cfg.Credentials = gosocks5.StaticCredentials(map[string]string{user: passwd})

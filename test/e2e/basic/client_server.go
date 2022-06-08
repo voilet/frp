@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/fatedier/frp/test/e2e/framework"
-	"github.com/fatedier/frp/test/e2e/framework/consts"
-	"github.com/fatedier/frp/test/e2e/pkg/cert"
-	"github.com/fatedier/frp/test/e2e/pkg/port"
+	"github.com/voilet/frp/test/e2e/framework"
+	"github.com/voilet/frp/test/e2e/framework/consts"
+	"github.com/voilet/frp/test/e2e/pkg/cert"
+	"github.com/voilet/frp/test/e2e/pkg/port"
 
 	. "github.com/onsi/ginkgo"
 )
@@ -230,5 +230,23 @@ var _ = Describe("[Feature: Client-Server]", func() {
 				expectError: true,
 			})
 		})
+	})
+
+	Describe("TLS with disable_custom_tls_first_byte", func() {
+		supportProtocols := []string{"tcp", "kcp", "websocket"}
+		for _, protocol := range supportProtocols {
+			tmp := protocol
+			defineClientServerTest("TLS over "+strings.ToUpper(tmp), f, &generalTestConfigures{
+				server: fmt.Sprintf(`
+					kcp_bind_port = {{ .%s }}
+					protocol = %s
+					`, consts.PortServerName, protocol),
+				client: fmt.Sprintf(`
+					tls_enable = true
+					protocol = %s
+					disable_custom_tls_first_byte = true
+					`, protocol),
+			})
+		}
 	})
 })
