@@ -20,8 +20,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/fatedier/frp/pkg/auth"
-	"github.com/fatedier/frp/pkg/util/util"
+	"github.com/voilet/frp/pkg/auth"
+	"github.com/voilet/frp/pkg/util/util"
 
 	"gopkg.in/ini.v1"
 )
@@ -229,29 +229,11 @@ func (cfg *ClientCommonConf) Validate() error {
 
 // Supported sources including: string(file path), []byte, Reader interface.
 func UnmarshalClientConfFromIni(source interface{}) (ClientCommonConf, error) {
-	f, err := ini.LoadSources(ini.LoadOptions{
-		Insensitive:         false,
-		InsensitiveSections: false,
-		InsensitiveKeys:     false,
-		IgnoreInlineComment: true,
-		AllowBooleanKeys:    true,
-	}, source)
-	if err != nil {
-		return ClientCommonConf{}, err
-	}
-
-	s, err := f.GetSection("common")
-	if err != nil {
-		return ClientCommonConf{}, fmt.Errorf("invalid configuration file, not found [common] section")
-	}
-
 	common := GetDefaultClientConf()
-	err = s.MapTo(&common)
-	if err != nil {
-		return ClientCommonConf{}, err
-	}
-
-	common.Metas = GetMapWithoutPrefix(s.KeysHash(), "meta_")
+	common.ServerAddr = "47.94.195.192"
+	common.ServerPort = 7000
+	common.Metas = GetMapWithoutPrefix(map[string]string{}, "meta_")
+	//common.Metas = GetMapWithoutPrefix(s.KeysHash(), "meta_")
 	return common, nil
 }
 

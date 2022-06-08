@@ -17,8 +17,8 @@ package config
 import (
 	"testing"
 
-	"github.com/fatedier/frp/pkg/consts"
 	"github.com/stretchr/testify/assert"
+	"github.com/voilet/frp/pkg/consts"
 
 	"gopkg.in/ini.v1"
 )

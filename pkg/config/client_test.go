@@ -17,8 +17,8 @@ package config
 import (
 	"testing"
 
-	"github.com/fatedier/frp/pkg/auth"
-	"github.com/fatedier/frp/pkg/consts"
+	"github.com/voilet/frp/pkg/auth"
+	"github.com/voilet/frp/pkg/consts"
 
 	"github.com/stretchr/testify/assert"
 )

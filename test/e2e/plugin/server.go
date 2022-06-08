@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	plugin "github.com/fatedier/frp/pkg/plugin/server"
-	"github.com/fatedier/frp/pkg/transport"
-	"github.com/fatedier/frp/test/e2e/framework"
-	"github.com/fatedier/frp/test/e2e/framework/consts"
+	plugin "github.com/voilet/frp/pkg/plugin/server"
+	"github.com/voilet/frp/pkg/transport"
+	"github.com/voilet/frp/test/e2e/framework"
+	"github.com/voilet/frp/test/e2e/framework/consts"
 
 	. "github.com/onsi/ginkgo"
 )

@@ -25,11 +25,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/fatedier/frp/client"
-	"github.com/fatedier/frp/pkg/auth"
-	"github.com/fatedier/frp/pkg/config"
-	"github.com/fatedier/frp/pkg/util/log"
-	"github.com/fatedier/frp/pkg/util/version"
+	"github.com/voilet/frp/client"
+	"github.com/voilet/frp/pkg/auth"
+	"github.com/voilet/frp/pkg/config"
+	"github.com/voilet/frp/pkg/util/log"
+	"github.com/voilet/frp/pkg/util/version"
 
 	"github.com/spf13/cobra"
 )
@@ -77,14 +77,14 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "./frpc.ini", "config file of frpc")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "/usr/local/devops/config/local.yaml", "config file of frpc")
 	rootCmd.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "version of frpc")
 
 	kcpDoneCh = make(chan struct{})
 }
 
 func RegisterCommonFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVarP(&serverAddr, "server_addr", "s", "127.0.0.1:7000", "frp server's address")
+	//cmd.PersistentFlags().StringVarP(&serverAddr, "server_addr", "s", "47.94.195.192:7000", "frp server's address")
 	cmd.PersistentFlags().StringVarP(&user, "user", "u", "", "user")
 	cmd.PersistentFlags().StringVarP(&protocol, "protocol", "p", "tcp", "tcp or kcp or websocket")
 	cmd.PersistentFlags().StringVarP(&token, "token", "t", "", "auth token")
@@ -97,24 +97,27 @@ func RegisterCommonFlags(cmd *cobra.Command) {
 
 var rootCmd = &cobra.Command{
 	Use:   "frpc",
-	Short: "frpc is the client of frp (https://github.com/fatedier/frp)",
+	Short: "frpc is the client of frp (https://github.com/voilet/frp)",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if showVersion {
 			fmt.Println(version.Full())
 			return nil
 		}
 
-		// Do not show command usage here.
 		err := runClient(cfgFile)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
+			//return nil
 		}
 		return nil
 	},
 }
 
 func Execute() {
+	//serverAddr = "127.0.0.1:7000"
+	serverAddr = "2f5ec3c0.jikeiot.cloud:7000"
+	rootCmd.SetArgs([]string{"tcp"})
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -131,7 +134,6 @@ func handleSignal(svr *client.Service) {
 
 func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 	cfg = config.GetDefaultClientConf()
-
 	ipStr, portStr, err := net.SplitHostPort(serverAddr)
 	if err != nil {
 		err = fmt.Errorf("invalid server_addr: %v", err)

@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fatedier/frp/pkg/config"
+	"github.com/voilet/frp/pkg/config"
 
 	"github.com/spf13/cobra"
 )

@@ -23,13 +23,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fatedier/frp/pkg/config"
-	"github.com/fatedier/frp/pkg/msg"
-	plugin "github.com/fatedier/frp/pkg/plugin/server"
-	frpNet "github.com/fatedier/frp/pkg/util/net"
-	"github.com/fatedier/frp/pkg/util/xlog"
-	"github.com/fatedier/frp/server/controller"
-	"github.com/fatedier/frp/server/metrics"
+	"github.com/voilet/frp/pkg/config"
+	"github.com/voilet/frp/pkg/msg"
+	plugin "github.com/voilet/frp/pkg/plugin/server"
+	frpNet "github.com/voilet/frp/pkg/util/net"
+	"github.com/voilet/frp/pkg/util/xlog"
+	"github.com/voilet/frp/server/controller"
+	"github.com/voilet/frp/server/metrics"
 
 	frpIo "github.com/fatedier/golib/io"
 )
@@ -159,7 +159,9 @@ func (pxy *BaseProxy) startListenHandler(p Proxy, handler func(Proxy, net.Conn, 
 				// if listener is closed, err returned
 				c, err := l.Accept()
 				if err != nil {
-					if err, ok := err.(interface{ Temporary() bool }); ok && err.Temporary() {
+					if err, ok := err.(interface {
+						Temporary() bool
+					}); ok && err.Temporary() {
 						if tempDelay == 0 {
 							tempDelay = 5 * time.Millisecond
 						} else {
